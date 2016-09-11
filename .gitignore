@@ -1,0 +1,7 @@
+# Unity
+Temp/
+Library/
+
+# Visual Studio
+*.sln
+*.csproj
