@@ -97,7 +97,7 @@ namespace ConcaveHull {
             bool edgeIntersects;
             int count = 0;
             int count_line = 0;
-
+            
             while (count < nearbyPoints.Count) {
                 edgeIntersects = false;
                 cos1 = getCos(nearbyPoints[count], line.nodes[0], line.nodes[1]);
@@ -123,6 +123,9 @@ namespace ConcaveHull {
                                 middle_point = nearbyPoints[count];
                             }
                         } else {
+                            if(cos1 + cos2 > sumCos){
+                                middle_point = null;
+                            }
                             sumCos = cos1 + cos2;
                         }
                     }
