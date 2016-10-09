@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 # Convex Hull
-Graham scan adapted from [here](Adapted from: https://github.com/masphei/ConvexHull)
+Graham scan adapted from [here](https://github.com/masphei/ConvexHull)
  
 The MIT License (MIT)
 
