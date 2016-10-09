@@ -7,10 +7,23 @@ namespace ConcaveHull {
         public static List<Node> unused_nodes = new List<Node>();
         public static List<Line> hull_edges = new List<Line>();
         public static List<Line> hull_concave_edges = new List<Line>();
+        
+        public static List<Line> getHull(List<Node> nodes) {
+            List<Node> convexH = new List<Node>();
+            List<Line> exitLines = new List<Line>();
+            
+            convexH = new List<Node>();
+            convexH.AddRange(GrahamScan.convexHull(nodes));
+            for (int i = 0; i < convexH.Count - 1; i++) {
+                exitLines.Add(new Line(convexH[i], convexH[i + 1]));
+            }
+            exitLines.Add(new Line(convexH[0], convexH[convexH.Count - 1]));
+            return exitLines;
+        }
 
         public static void setConvHull(List<Node> nodes) {
             unused_nodes.AddRange(nodes);
-            hull_edges.AddRange(HullFunctions.getHull(nodes));
+            hull_edges.AddRange(getHull(nodes));
             foreach (Line line in hull_edges) {
                 foreach (Node node in line.nodes) {
                     if (unused_nodes.Find(a => a.id == node.id) != null) {

@@ -58,35 +58,7 @@ namespace ConcaveHull {
                 return true;
             }
         }
-
-        public static List<Line> getHull(List<Node> nodes) {
-            /* Generates the convex hull from a set of nodes
-             * I suggest using Graham scan algorithm instead
-             */
-            List<Line> hull = new List<Line>();
-            Node leftMostPoint = nodes[0];
-            Node previous;
-            Node current;
-            Node next;
-
-            foreach (Node node in nodes) {
-                if (node.y < leftMostPoint.y ||
-                    (node.y == leftMostPoint.y && node.x < leftMostPoint.x)) {
-                    leftMostPoint = node;
-                }
-            }
-            current = leftMostPoint;
-            previous = new Node(leftMostPoint.x + 1, leftMostPoint.y);
-            do {
-                next = getMinCosNode(nodes, current, previous);
-                hull.Add(new Line(current, next));
-                previous = current;
-                current = next;
-            } while (!(next.x == leftMostPoint.x && next.y == leftMostPoint.y));
-
-            return hull;
-        }
-
+                
         public static List<Line> setConcave(Line line, List<Node> nearbyPoints, List<Line> concave_hull, decimal concavity, bool isSquareGrid) {
             /* Adds a middlepoint to a line (if there can be one) to make it concave */
             List<Line> concave = new List<Line>();
