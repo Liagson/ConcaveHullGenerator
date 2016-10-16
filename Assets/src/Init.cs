@@ -29,6 +29,15 @@ namespace ConcaveHull {
             for (int x = 0; x < number_of_dots; x++) {
                 dot_list.Add(new Node(pseudorandom.Next(0, 100), pseudorandom.Next(0, 100), x));
             }
+            //Delete repeated nodes
+            for (int pivot_position = 0; pivot_position < dot_list.Count; pivot_position++) {
+                for (int position = 0; position < dot_list.Count; position++)
+                    if (dot_list[pivot_position].x == dot_list[position].x && dot_list[pivot_position].y == dot_list[position].y
+                        && dot_list[pivot_position].id != dot_list[position].id) {
+                        dot_list.RemoveAt(position);
+                        position--;
+                    }
+            }
         }
 
         void OnDrawGizmos() {
@@ -52,6 +61,9 @@ namespace ConcaveHull {
             for (int i = 0; i < dot_list.Count; i++) {
                 Gizmos.DrawSphere(new Vector3((float)dot_list[i].x, (float)dot_list[i].y, 0), 0.5f);
             }
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(new Vector3(42,1, 0), 0.5f);
         }
     }
 

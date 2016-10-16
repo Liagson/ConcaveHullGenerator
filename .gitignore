@@ -5,3 +5,5 @@ Library/
 # Visual Studio
 *.sln
 *.csproj
+*.meta
+*.suo
