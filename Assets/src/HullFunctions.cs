@@ -5,6 +5,19 @@ using System.Linq;
 namespace ConcaveHull {
     public class HullFunctions {
 
+        private static bool verticalIntersection(Line lineA, Line lineB) {
+            /* lineA is vertical */
+            double y_intersection;
+            if ((lineB.nodes[0].x > lineA.nodes[0].x) && (lineA.nodes[0].x > lineB.nodes[1].x) ||
+                    ((lineB.nodes[1].x > lineA.nodes[0].x) && (lineA.nodes[0].x > lineB.nodes[0].x))) {
+                y_intersection = (((lineB.nodes[1].y - lineB.nodes[0].y) * (lineA.nodes[0].x - lineB.nodes[0].x)) / (lineB.nodes[1].x - lineB.nodes[0].x)) + lineB.nodes[0].y;
+                return ((lineA.nodes[0].y > y_intersection) && (y_intersection > lineA.nodes[1].y))
+                    || ((lineA.nodes[1].y > y_intersection) && (y_intersection > lineA.nodes[0].y));
+            } else {
+                return false;
+            }
+        }
+
         public static bool intersection(Line lineA, Line lineB) {
             /* Returns true if segments collide
              * If they have in common a segment edge returns false
@@ -16,9 +29,7 @@ namespace ConcaveHull {
             double A1, A2;
             double b1, b2;
             decimal X;
-
-            double y_intersection;
-
+            
             if (Math.Max(lineA.nodes[0].x, lineA.nodes[1].x) < Math.Min(lineB.nodes[0].x, lineB.nodes[1].x)) {
                 return false; //Not a chance of intersection
             }
@@ -28,10 +39,7 @@ namespace ConcaveHull {
                 A1 = (lineA.nodes[0].y - lineA.nodes[1].y) / dif;
             } else {
                 //Segment is vertical
-                y_intersection = (((lineB.nodes[1].y - lineB.nodes[0].y) * (lineA.nodes[0].x - lineB.nodes[0].x)) + (lineB.nodes[0].y * (lineB.nodes[1].x - lineB.nodes[0].x))) 
-                    / (lineB.nodes[1].x - lineB.nodes[0].x);
-                return ((y_intersection > Math.Min(lineA.nodes[0].y, lineA.nodes[1].y)) &&
-                    (y_intersection  < Math.Max(lineA.nodes[0].y, lineA.nodes[1].y)));
+                A1 = 9999999;
             }
 
             dif = lineB.nodes[0].x - lineB.nodes[1].x;
@@ -39,15 +47,17 @@ namespace ConcaveHull {
                 A2 = (lineB.nodes[0].y - lineB.nodes[1].y) / dif;
             } else {
                 //Segment is vertical
-                y_intersection = (((lineA.nodes[1].y - lineA.nodes[0].y) * (lineB.nodes[0].x - lineA.nodes[0].x)) + (lineA.nodes[0].y * (lineA.nodes[1].x - lineA.nodes[0].x)))
-                    / (lineA.nodes[1].x - lineA.nodes[0].x);
-                return ((y_intersection > Math.Min(lineB.nodes[0].y, lineB.nodes[1].y)) &&
-                    (y_intersection < Math.Max(lineB.nodes[0].y, lineB.nodes[1].y)));
+                A2 = 9999999;
             }
 
             if (A1 == A2) {
                 return false; //Parallel
+            }else if(A1 == 9999999) {
+                return verticalIntersection(lineA, lineB);
+            } else if(A2 == 9999999) {
+                return verticalIntersection(lineB, lineA);
             }
+
             b1 = lineA.nodes[0].y - (A1 * lineA.nodes[0].x);
             b2 = lineB.nodes[0].y - (A2 * lineB.nodes[0].x);
             X = Math.Round(System.Convert.ToDecimal((b2 - b1) / (A1 - A2)), 4);
