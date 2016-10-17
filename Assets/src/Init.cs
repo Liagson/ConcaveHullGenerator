@@ -60,10 +60,7 @@ namespace ConcaveHull {
             Gizmos.color = Color.red;
             for (int i = 0; i < dot_list.Count; i++) {
                 Gizmos.DrawSphere(new Vector3((float)dot_list[i].x, (float)dot_list[i].y, 0), 0.5f);
-            }
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(new Vector3(42,1, 0), 0.5f);
+            }            
         }
     }
 

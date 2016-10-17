@@ -5,7 +5,7 @@ using System.Linq;
 namespace ConcaveHull {
     public class HullFunctions {
 
-        private static bool verticalIntersection(Line lineA, Line lineB) {
+        public static bool verticalIntersection(Line lineA, Line lineB) {
             /* lineA is vertical */
             double y_intersection;
             if ((lineB.nodes[0].x > lineA.nodes[0].x) && (lineA.nodes[0].x > lineB.nodes[1].x) ||
