@@ -94,9 +94,7 @@ namespace ConcaveHull {
                     if (!edgeIntersects) {
                         // Prevents from getting sharp angles between middlepoints
                         Node[] nearNodes = getHullNearbyNodes(line, concave_hull);
-                        if ((getCos(nearNodes[0], line.nodes[0], nearbyPoints[count]) > concavity) &&
-                            (getCos(line.nodes[0], nearbyPoints[count], nearNodes[0]) > concavity) &&
-                            (getCos(nearNodes[1], line.nodes[1], nearbyPoints[count]) > concavity) && 
+                        if ((getCos(line.nodes[0], nearbyPoints[count], nearNodes[0]) > concavity) &&
                             (getCos(line.nodes[1], nearbyPoints[count], nearNodes[1]) > concavity)) {
                             edge_length = Line.getLength(nearbyPoints[count], line.nodes[0]) + Line.getLength(nearbyPoints[count], line.nodes[1]);
                             // Prevents inner tangent lines to the concave hull
