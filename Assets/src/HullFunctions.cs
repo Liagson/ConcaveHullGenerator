@@ -102,11 +102,6 @@ namespace ConcaveHull {
                                 sumCos = cos1 + cos2;
                                 middle_point = nearbyPoints[count];
                             }
-                        } else {
-                            if(cos1 + cos2 > sumCos){
-                                middle_point = null;
-                            }
-                            sumCos = cos1 + cos2;
                         }
                     }
                 }
