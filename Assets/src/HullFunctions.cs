@@ -73,8 +73,7 @@ namespace ConcaveHull {
             /* Adds a middlepoint to a line (if there can be one) to make it concave */
             List<Line> concave = new List<Line>();
             decimal cos1, cos2;
-            decimal sumCos = -2;
-            double edge_length;
+            decimal sumCos = -2;            
             Node middle_point = null;
             bool edgeIntersects;
             int count = 0;
@@ -96,9 +95,8 @@ namespace ConcaveHull {
                         Node[] nearNodes = getHullNearbyNodes(line, concave_hull);
                         if ((getCos(line.nodes[0], nearbyPoints[count], nearNodes[0]) > concavity) &&
                             (getCos(line.nodes[1], nearbyPoints[count], nearNodes[1]) > concavity)) {
-                            edge_length = Line.getLength(nearbyPoints[count], line.nodes[0]) + Line.getLength(nearbyPoints[count], line.nodes[1]);
                             // Prevents inner tangent lines to the concave hull
-                            if (!(tangentToHull(line, edge_length, nearbyPoints[count], cos1, cos2, concave_hull) && isSquareGrid)) {
+                            if (!(tangentToHull(line, nearbyPoints[count], cos1, cos2, concave_hull) && isSquareGrid)) {
                                 sumCos = cos1 + cos2;
                                 middle_point = nearbyPoints[count];
                             }
@@ -116,7 +114,7 @@ namespace ConcaveHull {
             return concave;
         }
 
-        public static bool tangentToHull(Line line_treated, double edge_length, Node node, decimal cos1, decimal cos2, List<Line> concave_hull) {
+        public static bool tangentToHull(Line line_treated, Node node, decimal cos1, decimal cos2, List<Line> concave_hull) {
             /* A new middlepoint could (rarely) make a segment that's tangent to the hull.
              * This method detects these situations
              * I suggest turning this method of if you are not using square grids or if you have a high dot density
@@ -124,11 +122,15 @@ namespace ConcaveHull {
             bool isTangent = false;
             decimal current_cos1;
             decimal current_cos2;
+            double edge_length;
             List<int> nodes_searched = new List<int>();
             Line line;
             Node node_in_hull;
             int count_line = 0;
             int count_node = 0;
+
+            edge_length = Line.getLength(node, line_treated.nodes[0]) + Line.getLength(node, line_treated.nodes[1]);
+
 
             while (!isTangent && count_line < concave_hull.Count) {
                 line = concave_hull[count_line];
@@ -160,29 +162,7 @@ namespace ConcaveHull {
             double cos = (aPow2 + bPow2 - cPow2) / (2 * Math.Sqrt(aPow2 * bPow2));
             return Math.Round(System.Convert.ToDecimal(cos), 4);
         }
-
-        public static Node getMinCosNode(List<Node> nodes, Node pivot, Node previous) {
-            /* Given a set of points it returns the node with the smallest cos
-             * Used for the convex hull
-             * */
-            Dictionary<decimal, Node> cos_dict = new Dictionary<decimal, Node>();
-            decimal cos;
-            foreach (Node node in nodes) {
-                if (!(node.x == pivot.x && node.y == pivot.y)) {
-                    cos = getCos(node, previous, pivot);
-                    if (cos_dict.ContainsKey(cos)) {
-                        //Not strictly part of the convex hull but it helps to make the concave hull
-                        if (Line.getLength(cos_dict[cos], pivot) < Line.getLength(node, pivot)) {
-                            cos_dict[cos] = node;
-                        }
-                    } else {
-                        cos_dict.Add(cos, node);
-                    }
-                }
-            }
-            return cos_dict[cos_dict.Keys.Min()];
-        }
-
+        
         public static int[] getBoundary(Line line, int scaleFactor) {
             /* Giving a scaleFactor it returns an area around the line 
              * where we will search for nearby points 
