@@ -93,8 +93,8 @@ namespace ConcaveHull {
                     if (!edgeIntersects) {
                         // Prevents from getting sharp angles between middlepoints
                         Node[] nearNodes = getHullNearbyNodes(line, concave_hull);
-                        if ((getCos(line.nodes[0], nearbyPoints[count], nearNodes[0]) > concavity) &&
-                            (getCos(line.nodes[1], nearbyPoints[count], nearNodes[1]) > concavity)) {
+                        if ((getCos(nearbyPoints[count], nearNodes[0], line.nodes[0]) < -concavity) &&
+                            (getCos(nearbyPoints[count], nearNodes[1], line.nodes[1]) < -concavity)) {
                             // Prevents inner tangent lines to the concave hull
                             if (!(tangentToHull(line, nearbyPoints[count], cos1, cos2, concave_hull) && isSquareGrid)) {
                                 sumCos = cos1 + cos2;
