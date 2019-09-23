@@ -28,7 +28,7 @@ namespace ConcaveHull {
             double dif;
             double A1, A2;
             double b1, b2;
-            decimal X;
+            double X;
             
             if (Math.Max(lineA.nodes[0].x, lineA.nodes[1].x) < Math.Min(lineB.nodes[0].x, lineB.nodes[1].x)) {
                 return false; //Not a chance of intersection
@@ -60,20 +60,20 @@ namespace ConcaveHull {
 
             b1 = lineA.nodes[0].y - (A1 * lineA.nodes[0].x);
             b2 = lineB.nodes[0].y - (A2 * lineB.nodes[0].x);
-            X = Math.Round(System.Convert.ToDecimal((b2 - b1) / (A1 - A2)), 4);
-            if ((X <= System.Convert.ToDecimal(Math.Max(Math.Min(lineA.nodes[0].x, lineA.nodes[1].x), Math.Min(lineB.nodes[0].x, lineB.nodes[1].x)))) ||
-                (X >= System.Convert.ToDecimal(Math.Min(Math.Max(lineA.nodes[0].x, lineA.nodes[1].x), Math.Max(lineB.nodes[0].x, lineB.nodes[1].x))))) {
+            X = Math.Round((b2 - b1) / (A1 - A2), 4);
+            if ((X <= Math.Max(Math.Min(lineA.nodes[0].x, lineA.nodes[1].x), Math.Min(lineB.nodes[0].x, lineB.nodes[1].x))) ||
+                (X >= Math.Min(Math.Max(lineA.nodes[0].x, lineA.nodes[1].x), Math.Max(lineB.nodes[0].x, lineB.nodes[1].x)))) {
                 return false; //Out of bound
             } else {
                 return true;
             }
         }
                 
-        public static List<Line> setConcave(Line line, List<Node> nearbyPoints, List<Line> concave_hull, decimal concavity, bool isSquareGrid) {
+        public static List<Line> setConcave(Line line, List<Node> nearbyPoints, List<Line> concave_hull, double concavity, bool isSquareGrid) {
             /* Adds a middlepoint to a line (if there can be one) to make it concave */
             List<Line> concave = new List<Line>();
-            decimal cos1, cos2;
-            decimal sumCos = -2;            
+            double cos1, cos2;
+            double sumCos = -2;            
             Node middle_point = null;
             bool edgeIntersects;
             int count = 0;
@@ -114,14 +114,14 @@ namespace ConcaveHull {
             return concave;
         }
 
-        public static bool tangentToHull(Line line_treated, Node node, decimal cos1, decimal cos2, List<Line> concave_hull) {
+        public static bool tangentToHull(Line line_treated, Node node, double cos1, double cos2, List<Line> concave_hull) {
             /* A new middlepoint could (rarely) make a segment that's tangent to the hull.
              * This method detects these situations
              * I suggest turning this method of if you are not using square grids or if you have a high dot density
              * */
             bool isTangent = false;
-            decimal current_cos1;
-            decimal current_cos2;
+            double current_cos1;
+            double current_cos2;
             double edge_length;
             List<int> nodes_searched = new List<int>();
             Line line;
@@ -154,13 +154,13 @@ namespace ConcaveHull {
             return isTangent;
         }
 
-        public static decimal getCos(Node a, Node b, Node o) {
+        public static double getCos(Node a, Node b, Node o) {
             /* Law of cosines */
             double aPow2 = Math.Pow(a.x - o.x, 2) + Math.Pow(a.y - o.y, 2);
             double bPow2 = Math.Pow(b.x - o.x, 2) + Math.Pow(b.y - o.y, 2);
             double cPow2 = Math.Pow(a.x - b.x, 2) + Math.Pow(a.y - b.y, 2);
             double cos = (aPow2 + bPow2 - cPow2) / (2 * Math.Sqrt(aPow2 * bPow2));
-            return Math.Round(System.Convert.ToDecimal(cos), 4);
+            return Math.Round(cos, 4);
         }
         
         public static int[] getBoundary(Line line, int scaleFactor) {

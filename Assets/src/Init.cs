@@ -20,7 +20,7 @@ namespace ConcaveHull {
 
         public void generateHull() {
             Hull.setConvHull(dot_list);
-            Hull.setConcaveHull(Math.Round(System.Convert.ToDecimal(concavity), 2), scaleFactor, isSquareGrid);
+            Hull.setConcaveHull(concavity, scaleFactor, isSquareGrid);
         }
 
         public void setDots(int number_of_dots) {

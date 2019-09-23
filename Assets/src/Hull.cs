@@ -33,7 +33,7 @@ namespace ConcaveHull {
             }
         }
 
-        public static void setConcaveHull(decimal concavity, int scaleFactor, bool isSquareGrid) {
+        public static void setConcaveHull(double concavity, int scaleFactor, bool isSquareGrid) {
             /* Run setConvHull before! 
              * Concavity is a value used to restrict the concave angles 
              * it can go from -1 to 1 (it wont crash if you go further)
