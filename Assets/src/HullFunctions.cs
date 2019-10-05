@@ -1,186 +1,47 @@
-﻿using System;
+﻿using ConcaveHull;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ConcaveHull {
-    public class HullFunctions {
-
-        public static bool verticalIntersection(Line lineA, Line lineB) {
-            /* lineA is vertical */
-            double y_intersection;
-            if ((lineB.nodes[0].x > lineA.nodes[0].x) && (lineA.nodes[0].x > lineB.nodes[1].x) ||
-                    ((lineB.nodes[1].x > lineA.nodes[0].x) && (lineA.nodes[0].x > lineB.nodes[0].x))) {
-                y_intersection = (((lineB.nodes[1].y - lineB.nodes[0].y) * (lineA.nodes[0].x - lineB.nodes[0].x)) / (lineB.nodes[1].x - lineB.nodes[0].x)) + lineB.nodes[0].y;
-                return ((lineA.nodes[0].y > y_intersection) && (y_intersection > lineA.nodes[1].y))
-                    || ((lineA.nodes[1].y > y_intersection) && (y_intersection > lineA.nodes[0].y));
-            } else {
-                return false;
-            }
-        }
-
-        public static bool intersection(Line lineA, Line lineB) {
-            /* Returns true if segments collide
-             * If they have in common a segment edge returns false
-             * Algorithm obtained from: 
-             * http://stackoverflow.com/questions/3838329/how-can-i-check-if-two-segments-intersect
-             * Thanks OMG_peanuts !
-             * */
-            double dif;
-            double A1, A2;
-            double b1, b2;
-            double X;
-            
-            if (Math.Max(lineA.nodes[0].x, lineA.nodes[1].x) < Math.Min(lineB.nodes[0].x, lineB.nodes[1].x)) {
-                return false; //Not a chance of intersection
-            }
-
-            dif = lineA.nodes[0].x - lineA.nodes[1].x;
-            if (dif != 0) { //Avoids dividing by 0
-                A1 = (lineA.nodes[0].y - lineA.nodes[1].y) / dif;
-            } else {
-                //Segment is vertical
-                A1 = 9999999;
-            }
-
-            dif = lineB.nodes[0].x - lineB.nodes[1].x;
-            if (dif != 0) { //Avoids dividing by 0
-                A2 = (lineB.nodes[0].y - lineB.nodes[1].y) / dif;
-            } else {
-                //Segment is vertical
-                A2 = 9999999;
-            }
-
-            if (A1 == A2) {
-                return false; //Parallel
-            }else if(A1 == 9999999) {
-                return verticalIntersection(lineA, lineB);
-            } else if(A2 == 9999999) {
-                return verticalIntersection(lineB, lineA);
-            }
-
-            b1 = lineA.nodes[0].y - (A1 * lineA.nodes[0].x);
-            b2 = lineB.nodes[0].y - (A2 * lineB.nodes[0].x);
-            X = Math.Round((b2 - b1) / (A1 - A2), 4);
-            if ((X <= Math.Max(Math.Min(lineA.nodes[0].x, lineA.nodes[1].x), Math.Min(lineB.nodes[0].x, lineB.nodes[1].x))) ||
-                (X >= Math.Min(Math.Max(lineA.nodes[0].x, lineA.nodes[1].x), Math.Max(lineB.nodes[0].x, lineB.nodes[1].x)))) {
-                return false; //Out of bound
-            } else {
-                return true;
-            }
-        }
-                
-        public static List<Line> setConcave(Line line, List<Node> nearbyPoints, List<Line> concave_hull, double concavity, bool isSquareGrid) {
-            /* Adds a middlepoint to a line (if there can be one) to make it concave */
-            List<Line> concave = new List<Line>();
-            double cos1, cos2;
-            double sumCos = -2;            
-            Node middle_point = null;
-            bool edgeIntersects;
-            int count = 0;
-            int count_line = 0;
-            
-            while (count < nearbyPoints.Count) {
-                edgeIntersects = false;
-                cos1 = getCos(nearbyPoints[count], line.nodes[0], line.nodes[1]);
-                cos2 = getCos(nearbyPoints[count], line.nodes[1], line.nodes[0]);
-                if (cos1 + cos2 >= sumCos && (cos1 > concavity && cos2 > concavity)) {
-                    count_line = 0;
-                    while (!edgeIntersects && count_line < concave_hull.Count) {
-                        edgeIntersects = (intersection(concave_hull[count_line], new Line(nearbyPoints[count], line.nodes[0]))
-                            || (intersection(concave_hull[count_line], new Line(nearbyPoints[count], line.nodes[1]))));
-                        count_line++;
-                    }
-                    if (!edgeIntersects) {
-                        // Prevents from getting sharp angles between middlepoints
-                        Node[] nearNodes = getHullNearbyNodes(line, concave_hull);
-                        if ((getCos(nearbyPoints[count], nearNodes[0], line.nodes[0]) < -concavity) &&
-                            (getCos(nearbyPoints[count], nearNodes[1], line.nodes[1]) < -concavity)) {
-                            // Prevents inner tangent lines to the concave hull
-                            if (!(tangentToHull(line, nearbyPoints[count], cos1, cos2, concave_hull) && isSquareGrid)) {
-                                sumCos = cos1 + cos2;
-                                middle_point = nearbyPoints[count];
-                            }
-                        }
+namespace Assets.src
+{
+    public static class HullFunctions
+    { 
+        public static List<Line> getDividedLine(Line line, List<Node> nearbyPoints, List<Line> concave_hull, double concavity) {
+            // returns two lines if a valid middlePoint is found
+            List<Line> dividedLine = new List<Line>();
+            List<Node> okMiddlePoints = new List<Node>();
+            foreach(Node middlePoint in nearbyPoints) {
+                double _cos = getCos(line.nodes[0], line.nodes[1], middlePoint);
+                if (_cos < concavity ) {
+                    Line newLineA = new Line(line.nodes[0], middlePoint);
+                    Line newLineB = new Line(middlePoint, line.nodes[1]);
+                    if (!lineCollidesWithHull(newLineA, concave_hull) && !lineCollidesWithHull(newLineB, concave_hull)) {
+                        middlePoint.cos = _cos;
+                        okMiddlePoints.Add(middlePoint);
                     }
                 }
-                count++;
             }
-            if (middle_point == null) {
-                concave.Add(line);
-            } else {
-                concave.Add(new Line(middle_point, line.nodes[0]));
-                concave.Add(new Line(middle_point, line.nodes[1]));
+            if (okMiddlePoints.Count > 0) {
+                // We want the middlepoint to be the one with less angle
+                okMiddlePoints = okMiddlePoints.OrderBy(p => p.cos).ToList();
+                dividedLine.Add(new Line(line.nodes[0], okMiddlePoints[0]));
+                dividedLine.Add(new Line(okMiddlePoints[0], line.nodes[1]));
             }
-            return concave;
+            return dividedLine;
         }
 
-        public static bool tangentToHull(Line line_treated, Node node, double cos1, double cos2, List<Line> concave_hull) {
-            /* A new middlepoint could (rarely) make a segment that's tangent to the hull.
-             * This method detects these situations
-             * I suggest turning this method of if you are not using square grids or if you have a high dot density
-             * */
-            bool isTangent = false;
-            double current_cos1;
-            double current_cos2;
-            double edge_length;
-            List<int> nodes_searched = new List<int>();
-            Line line;
-            Node node_in_hull;
-            int count_line = 0;
-            int count_node = 0;
-
-            edge_length = Line.getLength(node, line_treated.nodes[0]) + Line.getLength(node, line_treated.nodes[1]);
-
-
-            while (!isTangent && count_line < concave_hull.Count) {
-                line = concave_hull[count_line];
-                while (!isTangent && count_node < 2) {
-                    node_in_hull = line.nodes[count_node];
-                    if (!nodes_searched.Contains(node_in_hull.id)) {
-                        if (node_in_hull.id != line_treated.nodes[0].id && node_in_hull.id != line_treated.nodes[1].id) {
-                            current_cos1 = getCos(node_in_hull, line_treated.nodes[0], line_treated.nodes[1]);
-                            current_cos2 = getCos(node_in_hull, line_treated.nodes[1], line_treated.nodes[0]);
-                            if (current_cos1 == cos1 || current_cos2 == cos2) {
-                                isTangent = (Line.getLength(node_in_hull, line_treated.nodes[0]) + Line.getLength(node_in_hull, line_treated.nodes[1]) < edge_length);
-                            }
-                        }
-                    }
-                    nodes_searched.Add(node_in_hull.id);
-                    count_node++;
-                }
-                count_node = 0;
-                count_line++;
+        public static bool lineCollidesWithHull(Line line, List<Line> concave_hull) {
+            foreach(Line hullLine in concave_hull) {
+                // We don't want to check a collision with this point that forms the hull AND the line
+                if (line.nodes[0].id != hullLine.nodes[0].id && line.nodes[0].id != hullLine.nodes[1].id
+                    && line.nodes[1].id != hullLine.nodes[0].id && line.nodes[1].id != hullLine.nodes[1].id) {
+                    // Avoid line interesections with the rest of the hull
+                    if (LineIntersectionFunctions.doIntersect(line.nodes[0], line.nodes[1], hullLine.nodes[0], hullLine.nodes[1]))
+                        return true;
+                }  
             }
-            return isTangent;
-        }
-
-        public static double getCos(Node a, Node b, Node o) {
-            /* Law of cosines */
-            double aPow2 = Math.Pow(a.x - o.x, 2) + Math.Pow(a.y - o.y, 2);
-            double bPow2 = Math.Pow(b.x - o.x, 2) + Math.Pow(b.y - o.y, 2);
-            double cPow2 = Math.Pow(a.x - b.x, 2) + Math.Pow(a.y - b.y, 2);
-            double cos = (aPow2 + bPow2 - cPow2) / (2 * Math.Sqrt(aPow2 * bPow2));
-            return Math.Round(cos, 4);
-        }
-        
-        public static int[] getBoundary(Line line, int scaleFactor) {
-            /* Giving a scaleFactor it returns an area around the line 
-             * where we will search for nearby points 
-             * */
-            int[] boundary = new int[4];
-            Node aNode = line.nodes[0];
-            Node bNode = line.nodes[1];
-            int min_x_position = (int)Math.Floor(Math.Min(aNode.x, bNode.x) / scaleFactor);
-            int min_y_position = (int)Math.Floor(Math.Min(aNode.y, bNode.y) / scaleFactor);
-            int max_x_position = (int)Math.Floor(Math.Max(aNode.x, bNode.x) / scaleFactor);
-            int max_y_position = (int)Math.Floor(Math.Max(aNode.y, bNode.y) / scaleFactor);
-
-            boundary[0] = min_x_position;
-            boundary[1] = min_y_position;
-            boundary[2] = max_x_position;
-            boundary[3] = max_y_position;
-
-            return boundary;
+            return false;
         }
 
         public static List<Node> getNearbyPoints(Line line, List<Node> nodeList, int scaleFactor) {
@@ -218,37 +79,34 @@ namespace ConcaveHull {
             return nearbyPoints;
         }
 
-        public static Node[] getHullNearbyNodes(Line line, List<Line> concave_hull) {
-            /* Return previous and next nodes to a line in the hull */
-            Node[] nearbyHullNodes = new Node[2];
-            int leftNodeID = line.nodes[0].id;
-            int rightNodeID = line.nodes[1].id;
-            int currentID;
-            int nodesFound = 0;
-            int line_count = 0;
-            int position = 0;
-            int opposite_position = 1;
+        private static double getCos(Node A, Node B, Node O) {
+            /* Law of cosines */
+            double aPow2 = Math.Pow(A.x - O.x, 2) + Math.Pow(A.y - O.y, 2);
+            double bPow2 = Math.Pow(B.x - O.x, 2) + Math.Pow(B.y - O.y, 2);
+            double cPow2 = Math.Pow(A.x - B.x, 2) + Math.Pow(A.y - B.y, 2);
+            double cos = (aPow2 + bPow2 - cPow2) / (2 * Math.Sqrt(aPow2 * bPow2));
+            return Math.Round(cos, 4);
+        }
 
-            while(nodesFound < 2) {
-                position = 0;
-                opposite_position = 1;
-                while (position < 2) {
-                    currentID = concave_hull[line_count].nodes[position].id;
-                    if(currentID == leftNodeID &&
-                        concave_hull[line_count].nodes[opposite_position].id != rightNodeID) {
-                        nearbyHullNodes[0] = concave_hull[line_count].nodes[opposite_position];
-                        nodesFound++;
-                    }else if (currentID == rightNodeID && 
-                        concave_hull[line_count].nodes[opposite_position].id != leftNodeID) {
-                        nearbyHullNodes[1] = concave_hull[line_count].nodes[opposite_position];
-                        nodesFound++;
-                    }
-                    position++;
-                    opposite_position--;
-                }
-                line_count++;
-            }
-            return nearbyHullNodes;
+        private static int[] getBoundary(Line line, int scaleFactor) {
+            /* Giving a scaleFactor it returns an area around the line 
+             * where we will search for nearby points 
+             * */
+            int[] boundary = new int[4];
+            Node aNode = line.nodes[0];
+            Node bNode = line.nodes[1];
+            int min_x_position = (int)Math.Floor(Math.Min(aNode.x, bNode.x) / scaleFactor);
+            int min_y_position = (int)Math.Floor(Math.Min(aNode.y, bNode.y) / scaleFactor);
+            int max_x_position = (int)Math.Floor(Math.Max(aNode.x, bNode.x) / scaleFactor);
+            int max_y_position = (int)Math.Floor(Math.Max(aNode.y, bNode.y) / scaleFactor);
+
+            boundary[0] = min_x_position;
+            boundary[1] = min_y_position;
+            boundary[2] = max_x_position;
+            boundary[3] = max_y_position;
+
+            return boundary;
         }
     }
 }
+

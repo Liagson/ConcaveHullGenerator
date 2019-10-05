@@ -2,7 +2,6 @@
 
 namespace ConcaveHull {
     public class Line {
-        public bool isChecked = false;
         public Node[] nodes = new Node[2];
         public Line(Node n1, Node n2) {
             nodes[0] = n1;

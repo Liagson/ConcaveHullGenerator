@@ -3,10 +3,7 @@
         public int id;
         public double x;
         public double y;
-        public Node(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
+        public double cos;
         public Node(double x, double y, int id) {
             this.x = x;
             this.y = y;
