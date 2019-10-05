@@ -52,10 +52,10 @@ namespace Assets.src
              * if it's too big it will add points that will not be used and will consume time
              * */
             List<Node> nearbyPoints = new List<Node>();
-            int[] boundary;
+            double[] boundary;
             int tries = 0;
-            int node_x_rel_pos;
-            int node_y_rel_pos;
+            double node_x_rel_pos;
+            double node_y_rel_pos;
 
             while (tries < 2 && nearbyPoints.Count == 0) {
                 boundary = getBoundary(line, scaleFactor);
@@ -63,8 +63,8 @@ namespace Assets.src
                     //Not part of the line
                     if (!(node.x == line.nodes[0].x && node.y == line.nodes[0].y ||
                         node.x == line.nodes[1].x && node.y == line.nodes[1].y)) {
-                        node_x_rel_pos = (int)Math.Floor(node.x / scaleFactor);
-                        node_y_rel_pos = (int)Math.Floor(node.y / scaleFactor);
+                        node_x_rel_pos = Math.Floor(node.x / scaleFactor);
+                        node_y_rel_pos = Math.Floor(node.y / scaleFactor);
                         //Inside the boundary
                         if (node_x_rel_pos >= boundary[0] && node_x_rel_pos <= boundary[2] &&
                             node_y_rel_pos >= boundary[1] && node_y_rel_pos <= boundary[3]) {
@@ -88,17 +88,17 @@ namespace Assets.src
             return Math.Round(cos, 4);
         }
 
-        private static int[] getBoundary(Line line, int scaleFactor) {
+        private static double[] getBoundary(Line line, int scaleFactor) {
             /* Giving a scaleFactor it returns an area around the line 
              * where we will search for nearby points 
              * */
-            int[] boundary = new int[4];
+            double[] boundary = new double[4];
             Node aNode = line.nodes[0];
             Node bNode = line.nodes[1];
-            int min_x_position = (int)Math.Floor(Math.Min(aNode.x, bNode.x) / scaleFactor);
-            int min_y_position = (int)Math.Floor(Math.Min(aNode.y, bNode.y) / scaleFactor);
-            int max_x_position = (int)Math.Floor(Math.Max(aNode.x, bNode.x) / scaleFactor);
-            int max_y_position = (int)Math.Floor(Math.Max(aNode.y, bNode.y) / scaleFactor);
+            double min_x_position = Math.Floor(Math.Min(aNode.x, bNode.x) / scaleFactor);
+            double min_y_position = Math.Floor(Math.Min(aNode.y, bNode.y) / scaleFactor);
+            double max_x_position = Math.Floor(Math.Max(aNode.x, bNode.x) / scaleFactor);
+            double max_y_position = Math.Floor(Math.Max(aNode.y, bNode.y) / scaleFactor);
 
             boundary[0] = min_x_position;
             boundary[1] = min_y_position;
