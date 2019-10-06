@@ -9,6 +9,7 @@ namespace Assets.src
     { 
         public static List<Line> getDividedLine(Line line, List<Node> nearbyPoints, List<Line> concave_hull, double concavity) {
             // returns two lines if a valid middlePoint is found
+            // returns empty list if the line can't be divided
             List<Line> dividedLine = new List<Line>();
             List<Node> okMiddlePoints = new List<Node>();
             foreach(Node middlePoint in nearbyPoints) {
@@ -23,7 +24,7 @@ namespace Assets.src
                 }
             }
             if (okMiddlePoints.Count > 0) {
-                // We want the middlepoint to be the one with less angle
+                // We want the middlepoint to be the one with the widest angle (smallest cosine)
                 okMiddlePoints = okMiddlePoints.OrderBy(p => p.cos).ToList();
                 dividedLine.Add(new Line(line.nodes[0], okMiddlePoints[0]));
                 dividedLine.Add(new Line(okMiddlePoints[0], line.nodes[1]));
@@ -42,6 +43,15 @@ namespace Assets.src
                 }  
             }
             return false;
+        }
+
+        private static double getCos(Node A, Node B, Node O) {
+            /* Law of cosines */
+            double aPow2 = Math.Pow(A.x - O.x, 2) + Math.Pow(A.y - O.y, 2);
+            double bPow2 = Math.Pow(B.x - O.x, 2) + Math.Pow(B.y - O.y, 2);
+            double cPow2 = Math.Pow(A.x - B.x, 2) + Math.Pow(A.y - B.y, 2);
+            double cos = (aPow2 + bPow2 - cPow2) / (2 * Math.Sqrt(aPow2 * bPow2));
+            return Math.Round(cos, 4);
         }
 
         public static List<Node> getNearbyPoints(Line line, List<Node> nodeList, int scaleFactor) {
@@ -77,15 +87,6 @@ namespace Assets.src
                 tries++;
             }
             return nearbyPoints;
-        }
-
-        private static double getCos(Node A, Node B, Node O) {
-            /* Law of cosines */
-            double aPow2 = Math.Pow(A.x - O.x, 2) + Math.Pow(A.y - O.y, 2);
-            double bPow2 = Math.Pow(B.x - O.x, 2) + Math.Pow(B.y - O.y, 2);
-            double cPow2 = Math.Pow(A.x - B.x, 2) + Math.Pow(A.y - B.y, 2);
-            double cos = (aPow2 + bPow2 - cPow2) / (2 * Math.Sqrt(aPow2 * bPow2));
-            return Math.Round(cos, 4);
         }
 
         private static double[] getBoundary(Line line, int scaleFactor) {

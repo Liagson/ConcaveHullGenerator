@@ -7,7 +7,7 @@ namespace ConcaveHull {
         public static List<Node> unused_nodes = new List<Node>();
         public static List<Line> hull_edges = new List<Line>();
         public static List<Line> hull_concave_edges = new List<Line>();
-        
+
         public static List<Line> getHull(List<Node> nodes) {
             List<Node> convexH = new List<Node>();
             List<Line> exitLines = new List<Line>();
@@ -21,7 +21,7 @@ namespace ConcaveHull {
             return exitLines;
         }
 
-        public static void setConvHull(List<Node> nodes) {
+        public static void setConvexHull(List<Node> nodes) {
             unused_nodes.AddRange(nodes);
             hull_edges.AddRange(getHull(nodes));
             foreach (Line line in hull_edges) {
@@ -30,7 +30,7 @@ namespace ConcaveHull {
                 }
             }
         }
-        
+
         public static List<Line> setConcaveHull(double concavity, int scaleFactor) {
             /* Run setConvHull before! 
              * Concavity is a value used to restrict the concave angles 
@@ -43,8 +43,8 @@ namespace ConcaveHull {
                 aLineWasDividedInTheIteration = false;
                 for(int linePositionInHull = 0; linePositionInHull < hull_concave_edges.Count && !aLineWasDividedInTheIteration; linePositionInHull++) {
                     Line line = hull_concave_edges[linePositionInHull];
-                    List<Node> nearbyPoints = Assets.src.HullFunctions.getNearbyPoints(line, unused_nodes, scaleFactor);
-                    List<Line> dividedLine = Assets.src.HullFunctions.getDividedLine(line, nearbyPoints, hull_concave_edges, concavity);
+                    List<Node> nearbyPoints = HullFunctions.getNearbyPoints(line, unused_nodes, scaleFactor);
+                    List<Line> dividedLine = HullFunctions.getDividedLine(line, nearbyPoints, hull_concave_edges, concavity);
                     if (dividedLine.Count > 0) { // Line divided!
                         aLineWasDividedInTheIteration = true;
                         unused_nodes.Remove(unused_nodes.Where(n => n.id == dividedLine[0].nodes[1].id).FirstOrDefault()); // Middlepoint no longer free
