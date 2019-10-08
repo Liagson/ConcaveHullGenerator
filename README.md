@@ -1,3 +1,6 @@
+# Deprecated documentation: Incoming updates coming soon!
+**Major changes:** `Concavity` parameter has been reversed (mathematically it makes sense this way). Setting  to -1 will leave the hull convex, while rising it to 1 will add add up to 0º angles. `isSquareGrid` boolean is also gone (tangent lines are now always checked)
+
 # Concave hull generator
 Unite all dots under the smallest possible area. It comes with a simple demo for unity using just gizmos.
 
@@ -7,6 +10,3 @@ Inspired by *[Implementation of a fast and efficient concave hull algorith](http
 
 ![IMG2](https://raw.githubusercontent.com/Liagson/ConcaveHullGenerator/master/Pics/Steps.png)
 Middlepoints are searched in an area around the edge that can be set using the `scaleFactor` variable. The higher the area the slower the program will be.
-
-Another variable to take in consideration is the `isSquareGrid` boolean. When using square grids for the dot distribution it could occur that the addition of a middlepoint creates a segment tangent to the hull. If true a check is made to avoid this situation. Warning: It could be a time consuming check.
-![IMG3](https://raw.githubusercontent.com/Liagson/ConcaveHullGenerator/master/Pics/Tangent_error.png)
