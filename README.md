@@ -1,7 +1,5 @@
-# Deprecated documentation: Incoming updates coming soon!
-
 # Concave hull generator
-Unite all dots under the smallest possible area. It comes with a simple demo for unity using just gizmos.
+Unite all dots under the smallest possible area. It comes with a simple demo for the *Unity game engine* using just gizmos.
 
 ## How it works
 The program has only two easy steps:
@@ -16,7 +14,12 @@ For more info you can check the `Init.cs` file and follow the demo :)
 
 ![IMG1](https://github.com/Liagson/ConcaveHullGenerator/blob/master/Pics/Concavity.png)
 ## Algorithm
-Inspired by *[Implementation of a fast and efficient concave hull algorith](http://www.it.uu.se/edu/course/homepage/projektTDB/ht13/project10/Project-10-report.pdf)*, the concave hull is reached through the finding of middlepoints within the edges of the convex hull. If the cosine between the middlepoint and the edge nodes is greater than the `concavity`variable the segment will be partitioned in two new ones using the new point. The search for middlepoints starts from the longest edge to the shortest. If no middlepoints are found the program will end.
+Inspired by *[Implementation of a fast and efficient concave hull algorith](http://www.it.uu.se/edu/course/homepage/projektTDB/ht13/project10/Project-10-report.pdf)*, the concave hull is reached through the iteration of four basic steps:
+1. We find the points close to the longest edge of a hull. The distance is directly related to the value of `scaleFactor`
+2. We measure the angle (in reality the *cosine* of this angle) of every point related to this segment.
+3. We will select the point that gives us the widest angle/cosine. If the value of the cosine is inferior to the value of `concavity` we will discard this point.
+4. The point will be used to divide the segment into two new ones. The process will be repeated until no more divisions are made.
 
 ![IMG2](https://raw.githubusercontent.com/Liagson/ConcaveHullGenerator/master/Pics/Steps.png)
-Middlepoints are searched in an area around the edge that can be set using the `scaleFactor` variable. The higher the area the slower the program will be.
+
+
