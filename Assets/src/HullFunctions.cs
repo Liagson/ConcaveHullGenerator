@@ -54,59 +54,30 @@ namespace Assets.src
             return Math.Round(cos, 4);
         }
 
-        public static List<Node> getNearbyPoints(Line line, List<Node> nodeList, int scaleFactor) {
+        public static List<Node> getNearbyPoints(Line line, List<Node> nodeList, double scaleFactor) {
             /* The bigger the scaleFactor the more points it will return
-             * Inspired by this precious algorithm:
-             * http://www.it.uu.se/edu/course/homepage/projektTDB/ht13/project10/Project-10-report.pdf
+             * We calculate an ellipse arround the nodes that define the line (the focus points of said ellipse)
+             * We will add all nodes contained within the base ellipse scaled to the scaleFactor
              * Be carefull: if it's too small it will return very little points (or non!), 
              * if it's too big it will add points that will not be used and will consume time
              * */
             List<Node> nearbyPoints = new List<Node>();
-            double[] boundary;
-            int tries = 0;
-            double node_x_rel_pos;
-            double node_y_rel_pos;
+            double lineLength = line.getLength();
+            double baseEllipseFocusSum = 2 * lineLength / Math.Sqrt(2);
+            double scaledBaseEllipseFocusSum = baseEllipseFocusSum * scaleFactor;
 
-            while (tries < 2 && nearbyPoints.Count == 0) {
-                boundary = getBoundary(line, scaleFactor);
-                foreach (Node node in nodeList) {
-                    //Not part of the line
-                    if (!(node.x == line.nodes[0].x && node.y == line.nodes[0].y ||
-                        node.x == line.nodes[1].x && node.y == line.nodes[1].y)) {
-                        node_x_rel_pos = Math.Floor(node.x / scaleFactor);
-                        node_y_rel_pos = Math.Floor(node.y / scaleFactor);
-                        //Inside the boundary
-                        if (node_x_rel_pos >= boundary[0] && node_x_rel_pos <= boundary[2] &&
-                            node_y_rel_pos >= boundary[1] && node_y_rel_pos <= boundary[3]) {
-                            nearbyPoints.Add(node);
-                        }
-                    }
+            foreach(Node node in nodeList)
+            {
+                double distanceToFocusA = Math.Sqrt(Math.Pow(line.nodes[0].x - node.x, 2) + Math.Pow(line.nodes[0].y - node.y, 2));
+                double distanceToFocusB = Math.Sqrt(Math.Pow(line.nodes[1].x - node.x, 2) + Math.Pow(line.nodes[1].y - node.y, 2));
+                double ellipseFocusSum = distanceToFocusA + distanceToFocusB;
+                if(ellipseFocusSum <= scaledBaseEllipseFocusSum)
+                {
+                    nearbyPoints.Add(node);
                 }
-                //if no points are found we increase the area
-                scaleFactor = scaleFactor * 4 / 3;
-                tries++;
             }
+            
             return nearbyPoints;
-        }
-
-        private static double[] getBoundary(Line line, int scaleFactor) {
-            /* Giving a scaleFactor it returns an area around the line 
-             * where we will search for nearby points 
-             * */
-            double[] boundary = new double[4];
-            Node aNode = line.nodes[0];
-            Node bNode = line.nodes[1];
-            double min_x_position = Math.Floor(Math.Min(aNode.x, bNode.x) / scaleFactor);
-            double min_y_position = Math.Floor(Math.Min(aNode.y, bNode.y) / scaleFactor);
-            double max_x_position = Math.Floor(Math.Max(aNode.x, bNode.x) / scaleFactor);
-            double max_y_position = Math.Floor(Math.Max(aNode.y, bNode.y) / scaleFactor);
-
-            boundary[0] = min_x_position;
-            boundary[1] = min_y_position;
-            boundary[2] = max_x_position;
-            boundary[3] = max_y_position;
-
-            return boundary;
         }
     }
 }

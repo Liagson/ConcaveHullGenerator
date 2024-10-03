@@ -31,7 +31,7 @@ namespace ConcaveHull {
             }
         }
 
-        public static List<Line> setConcaveHull(double concavity, int scaleFactor) {
+        public static List<Line> setConcaveHull(double concavity, double scaleFactor) {
             /* Run setConvHull before! 
              * Concavity is a value used to restrict the concave angles 
              * It can go from -1 (no concavity) to 1 (extreme concavity) 
