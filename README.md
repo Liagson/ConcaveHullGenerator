@@ -8,11 +8,16 @@ The program has only two easy steps:
 
 You only need to set two constants before running the program:
 * **concavity** : This sets how sharp you want the concave angles to be. It goes from `-1` (not concave at all. in fact, the hull will be left convex) up to `+1` (**very** sharp angles can occur. Setting concavity to `+1` might result in 0º angles!) `concavity` is defined as the cosine of the concave angles.
-* **scaleFactor** : This sets how big is the area where concavities are going to be searched. The bigger, the more sharp the angles can be. Setting it to a very high value might affect the performance of the program. This value should be relative to how close to each other the points to be connected are.
+  
+![IMG1](https://github.com/Liagson/ConcaveHullGenerator/blob/master/Pics/Concavity.png)
+
+* **scaleFactor** : This sets how big is the relative area around every single edge where concavities are going to be searched. I suggest a value between `1` and `2`, but it can be slightly smaller than 1 (always with a value `> 0`) or way greater than 2 if you are looking for crazy angles. Setting it to a very high value might affect the performance due to more points being processed. Internally we use `scaleFactor` for adjusting the size of the ellipse around every edge in order to search for valid nodes. If the point to look for is outside the ellipse then it won't be processed to check if it's a valid point for an edge.
+  
+![IMG1](https://github.com/Liagson/ConcaveHullGenerator/blob/master/Pics/ScaleFactorDiagram.png)
 
 For more info you can check the `Init.cs` file and follow the demo :)
 
-![IMG1](https://github.com/Liagson/ConcaveHullGenerator/blob/master/Pics/Concavity.png)
+
 ## Algorithm
 Inspired by *[Implementation of a fast and efficient concave hull algorith](http://www.it.uu.se/edu/course/homepage/projektTDB/ht13/project10/Project-10-report.pdf)*, the concave hull is reached through the iteration of four basic steps:
 1. We find the points close to the longest edge of a hull. The distance is directly related to the value of `scaleFactor`
