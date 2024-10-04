@@ -7,11 +7,14 @@ namespace ConcaveHull {
             nodes[0] = n1;
             nodes[1] = n2;
         }
+        public double getLength()
+        {
+            double length = Math.Sqrt(Math.Pow(nodes[0].y - nodes[1].y, 2) + Math.Pow(nodes[0].x - nodes[1].x, 2));
+            return length;
+        }
+
         public static double getLength(Node node1, Node node2) {
-            /* It actually calculates relative length */
-            double length;
-            length = Math.Pow(node1.y - node2.y, 2) + Math.Pow(node1.x - node2.x, 2);
-            //length = Math.sqrt(Math.Pow(node1.y - node2.y, 2) + Math.Pow(node1.x - node2.x, 2));
+            double length = Math.Sqrt(Math.Pow(node1.y - node2.y, 2) + Math.Pow(node1.x - node2.x, 2));
             return length;
         }
     }
